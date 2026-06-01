@@ -1,0 +1,42 @@
+{
+  "scores": {
+    "with_skill": {
+      "clarify_first": 5,
+      "quantified_estimates": 5,
+      "tradeoff_articulation": 5,
+      "failure_design": 5,
+      "pivot_on_constraint": 5,
+      "concrete_api_data": 5,
+      "total": 30
+    },
+    "baseline": {
+      "clarify_first": 3,
+      "quantified_estimates": 4,
+      "tradeoff_articulation": 3,
+      "failure_design": 3,
+      "pivot_on_constraint": 3,
+      "concrete_api_data": 4,
+      "total": 20
+    }
+  },
+  "blocks_consulted": [
+    "back-of-the-envelope",
+    "messaging-streaming (+ deep-dive)",
+    "data-storage",
+    "consistency-coordination (+ deep-dive)",
+    "api-design",
+    "resilience-failure",
+    "system-design (orchestrator)"
+  ],
+  "block_invocation_real": true,
+  "winner": "with_skill",
+  "per_behavior_delta": "Biggest gap is pivot_on_constraint and tradeoff_articulation. On the Round 2 1B-user/1.15M-msg-sec change, the with-skill answer explicitly ranks WHERE R1 breaks first (session-registry/routing hop hottest, then N-squared gateway mesh, then single-region, then notes the outbox store is the EASY part because the R1 partition key already scales linearly: shard_count = 1.2M / 10k = ~120 shards, no re-keying), then performs a real redesign: introduces a stateless message-router tier to kill the N-squared mesh, goes region-homed with causal (not linearizable) cross-region consistency via PACELC, and reframes group fan-out as an async stream job with sender-keys for O(1) per-message E2E cost. That is a constraint-driven redesign of the affected part, exactly failure-mode #10. The baseline also pivots competently (connections break first, shard registry, multi-region, queue-decoupled fan-out) but treats it more as a checklist than a ranked breaks-first diagnosis, and does not quantify the shard count or show the R1 key paying off. Trade-off articulation is the other large delta: the with-skill answer uses explicit solves/worsens/when-to-change tables per round (the exact tradeoff-framework.md contract) AND applies the sync-vs-async test honestly to REJECT Kafka on the hot 1:1 path (YAGNI guardrail) while admitting it only on the fan-out plane; the baseline names trade-offs prose-style and sometimes name-drops (Raft/consensus, CRDTs, key-transparency) without the worsens/when-to-change discipline. failure_design: with-skill enumerates SPOF + degradation + reconnect-storm-with-jitter + fail-open registry + DLQ-as-containment + sequencer split-brain with fencing tokens, and crucially surfaces the seam where 'server is a relay' collides with a week-offline multi-device sync; baseline covers failover/lost-cursor/device-revocation but lighter on degradation UX and reconnect-storm/backpressure specifics. clarify_first: with-skill ranks NFRs (durability > latency > availability-over-strong-consistency) and ties each clarification to a design consequence; baseline clarifies scope but does not rank or tie. concrete_api_data: near-tie \u2014 both pick PK=recipient_device_id wide-column and Snowflake IDs, but with-skill writes the actual SEND/ACK/DELIVER/RECEIPT wire frames, the client_msg_id idempotency-key dedup contract, and the explicit offline/sync delete-on-ack lifecycle; baseline's schemas are solid but the delivery contract is described rather than specified as a frame protocol. Where the skill helped LEAST: the core architecture and Round 3 ordering choice converge almost identically (per-conversation monotonic seq from a single serialization point, deterministic ordering, per-device cursors, sender-keys, prekey bundles) \u2014 the baseline is a strong answer, so the skill's marginal lift is in rigor/discipline (ranked breaks, quantified shards, solves/worsens/when-to-change, YAGNI on Kafka) rather than in reaching a fundamentally different design. Notably the baseline independently surfaces key-transparency/CONIKS and CRDT state convergence, which the with-skill answer does NOT \u2014 so on a couple of crypto/state-convergence specifics the baseline is actually richer.",
+  "top_gaps": [
+    "State convergence is missing: the with-skill answer orders messages well but never addresses how read-receipts/edits/deletes/reactions converge across devices. The baseline beats it here with CRDT-style ops (max() read-cursor, tombstones, LWW edits). Add a 'mutable per-key state convergence' note to consistency-coordination's deep-dive and have the orchestrator prompt for non-message state in chat/collab designs.",
+    "Key-distribution depth and trust model under-served: the with-skill answer covers X3DH prekey bundles and sender-keys but omits key-transparency / auditable key log (CONIKS) and the malicious-server-injects-a-device threat, which the baseline raises. The skill library has no security/trust block; the security/verification trade-off (safety numbers, key transparency) falls through the cracks. Consider a thin 'trust-and-keys' reference or a pointer in api-design/consistency-coordination.",
+    "No content-delivery / media path despite a dedicated content-delivery skill existing in the library: both answers wave at 'blob store + CDN' and move on. The with-skill run loaded 6 blocks but not content-delivery, so media upload/download, thumbnail/transcode pipeline, and CDN signed-URL contract are unanalyzed. Orchestrator should flag media as an in-scope sub-design (or explicitly defer with a reason) rather than silently dropping it.",
+    "The week-offline + delete-on-delivery seam is named but not sized: the answer says 'bounded retention window sized by how long a device may be dark' without a BOTEC. back-of-the-envelope composition should be triggered for the retention-window sizing (devices dark for N days x undelivered rate x message size), turning a hand-wave into a number \u2014 the very discipline the skill claims.",
+    "Round 3 sequencer scaling caveat is asserted, not worked: 'a single conversation exceeding one leader -> cap group size or relax to per-leader segments' needs the same shard-count math applied per-hot-conversation. consistency-coordination + back-of-the-envelope should co-fire to quantify when one conversation's write rate breaks its single sequencer, instead of leaving it as a when-to-change cell."
+  ],
+  "verdict": "The with-skill answer is clearly stronger and earns a near-perfect rubric score: it ranks where Round 1 breaks first, drives every Round 2 choice from re-run BOTEC numbers (shard_count = 1.2M / 10k = ~120 shards, showing the R1 partition key scales linearly with no re-keying), applies solves/worsens/when-to-change tables to every major decision, and uses the sync-vs-async and YAGNI guardrails to actively reject Kafka on the hot path. Composition is genuine \u2014 it reproduces distinctive, skill-owned content from at least five building blocks (PACELC + fencing tokens, the polling->WebSocket push tier + idempotency contract, wide-column key design + shard math, backlog-drain math + DLQ envelope + oldest-message-age signal), not just orchestrator framing. The baseline is a competent senior answer that reaches a similar core design and even out-covers the skill on CRDT state convergence and key transparency, but it is less disciplined on ranked breaks-first diagnosis, quantified shard counts, and the strict trade-off contract, so it loses on the dimensions the GUIDE most cares about."
+}

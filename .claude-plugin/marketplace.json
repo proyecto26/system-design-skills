@@ -1,0 +1,29 @@
+{
+  "name": "system-design-skills",
+  "owner": {
+    "name": "Proyecto 26",
+    "email": "jd@proyecto26.com",
+    "url": "https://github.com/proyecto26"
+  },
+  "metadata": {
+    "description": "Proyecto 26's Claude Code skills marketplace.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "system-design-skills",
+      "source": "./",
+      "description": "A divide-and-conquer wiki of system-design skills: reason about a design one part at a time (requirements, capacity, APIs, storage, caching, load balancing, messaging, consistency, resilience, delivery, scaling) with generic recipes, cloud-provider variants, explicit trade-offs, and failure-mode analysis. Includes a /design workflow command and an orchestrator agent.",
+      "version": "0.1.0",
+      "homepage": "https://github.com/proyecto26/system-design-skills",
+      "keywords": [
+        "system-design",
+        "architecture",
+        "distributed-systems",
+        "scalability",
+        "trade-offs",
+        "interview"
+      ]
+    }
+  ]
+}

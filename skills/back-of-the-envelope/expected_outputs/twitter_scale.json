@@ -1,0 +1,25 @@
+{
+  "inputs": {
+    "dau": 150000000.0,
+    "actions_per_user_per_day": 2.0,
+    "peak_factor": 2.0,
+    "object_bytes": 1000000.0,
+    "media_fraction": 0.1,
+    "retention_days": 1825.0,
+    "server_qps": 1000.0
+  },
+  "qps_avg": 3472,
+  "qps_peak": 6944,
+  "storage_per_day_bytes": 30000000000000,
+  "storage_total_bytes": 54750000000000000,
+  "bandwidth_peak_bytes_per_sec": 6944444444,
+  "servers_needed": 7,
+  "human": {
+    "qps_avg": "3.5K",
+    "qps_peak": "6.9K",
+    "storage_per_day": "30.0TB",
+    "storage_total": "54.8PB",
+    "bandwidth_peak": "6.9GB/s",
+    "servers_needed": "7"
+  }
+}

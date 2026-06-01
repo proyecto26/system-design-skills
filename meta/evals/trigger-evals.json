@@ -1,0 +1,27 @@
+{
+  "_about": "Trigger/routing evals for the plugin. The descriptions are the primary triggering mechanism (skill-creator) yet the content evals force-load skills by path, bypassing triggering — these test that the RIGHT skill fires from a realistic query. Oracle = the SKILL-CONTRACT.md ownership map (don't restate it; route_to is the owning skill). Focus on sibling near-misses and orchestrator-vs-single-block disambiguation. should_trigger=false are genuine near-misses or out-of-scope.",
+  "queries": [
+    {"q": "our users table is like 400GB now and queries are crawling, how do I split it across machines", "should_trigger": true, "route_to": "data-storage", "why": "sharding/partitioning is owned by data-storage, not caching"},
+    {"q": "i want consistent hashing for my redis cache nodes so adding a node doesn't remap everything", "should_trigger": true, "route_to": "consistency-coordination", "why": "consistent hashing theory is owned by consistency-coordination; caching applies it"},
+    {"q": "what eviction policy should i use for a session cache, LRU or TTL?", "should_trigger": true, "route_to": "caching", "why": "single-component question — caching, NOT the orchestrator"},
+    {"q": "design the backend for a ride-sharing app, we expect a few million users", "should_trigger": true, "route_to": "system-design", "why": "open-ended multi-component design → orchestrator"},
+    {"q": "rate limit our public API to 100 req/min per key and return proper headers", "should_trigger": true, "route_to": "resilience-failure", "why": "rate-limiting algorithms owned by resilience-failure"},
+    {"q": "i need globally unique, roughly time-sortable IDs generated on many servers without coordination", "should_trigger": true, "route_to": "sequencer", "why": "unique-ID generation is sequencer"},
+    {"q": "where should i store user-uploaded videos and how do i serve them fast worldwide", "should_trigger": true, "route_to": "blob-store", "why": "object storage is blob-store (and it pairs with content-delivery for the serving)"},
+    {"q": "set up SLOs, error budgets, and alerting for our services", "should_trigger": true, "route_to": "observability", "why": "SLO/SLI/alerting owned by observability"},
+    {"q": "we have 2000 services and need to centralize their logs at high volume with retention", "should_trigger": true, "route_to": "distributed-logging", "why": "the high-volume log pipeline is distributed-logging, not observability (which owns metrics/alerting)"},
+    {"q": "run a nightly job that emails every user a summary, at scale", "should_trigger": true, "route_to": "task-scheduling", "why": "scheduled/recurring background jobs → task-scheduling, which sits on top of messaging-streaming"},
+    {"q": "how do i count views on a viral video when millions hit it per second", "should_trigger": true, "route_to": "sharded-counters", "why": "high-write counting/contention is sharded-counters"},
+    {"q": "add fast full-text search with autocomplete over our product catalog", "should_trigger": true, "route_to": "distributed-search", "why": "inverted index / autocomplete is distributed-search, not a DB LIKE scan"},
+    {"q": "route users to the nearest datacenter and fail over if a region goes down", "should_trigger": true, "route_to": "dns", "why": "geo/latency/failover routing + anycast is dns"},
+    {"q": "should i use an L4 or L7 load balancer and how do health checks avoid hammering a recovering box", "should_trigger": true, "route_to": "load-balancing", "why": "L4/L7 + health checks owned by load-balancing"},
+    {"q": "put a CDN in front of our static assets and tune cache-control", "should_trigger": true, "route_to": "content-delivery", "why": "edge/CDN is content-delivery"},
+    {"q": "how many servers and how much storage will 100M DAU posting twice a day need", "should_trigger": true, "route_to": "back-of-the-envelope", "why": "capacity/QPS/storage sizing is back-of-the-envelope"},
+    {"q": "design the request/response and pagination for our public feed API with idempotent posts", "should_trigger": true, "route_to": "api-design", "why": "contracts/pagination/idempotency keys owned by api-design"},
+    {"q": "explain the CAP theorem trade-off during a network partition for leader-follower replication", "should_trigger": true, "route_to": "consistency-coordination", "why": "CAP/consistency theory owned by consistency-coordination"},
+    {"q": "write a python function to reverse a linked list", "should_trigger": false, "route_to": null, "why": "algorithm coding, not system design"},
+    {"q": "my react component re-renders too often, how do i memoize it", "should_trigger": false, "route_to": null, "why": "front-end perf, adjacent domain, out of scope"},
+    {"q": "what's the difference between a process and a thread", "should_trigger": false, "route_to": null, "why": "OS concept; near-miss on 'distributed' vocab but not a design task"},
+    {"q": "rename the variable foo to userCount across this file", "should_trigger": false, "route_to": null, "why": "refactor, not design"}
+  ]
+}

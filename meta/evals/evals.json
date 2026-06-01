@@ -1,0 +1,112 @@
+{
+  "_about": "Realistic eval set for the system-design-skills plugin. Single home for exercises — the eval workflow READS from here (don't inline exercises in the workflow JS). Each exercise LEADS WITH different building blocks so coverage spans the catalog, and is MULTI-TURN: deliver turns sequentially (answer turn 1, THEN inject turn 2's constraint) so pivot_on_constraint and collaboration are tested honestly rather than pre-planned.",
+  "rubric": {
+    "_reuse": "Do NOT re-author a rubric. Score each turn's cumulative design on the SAME 6 behaviors used in whatsapp-eval.workflow.js, 0-5 each (total /30).",
+    "behaviors": ["clarify_first", "quantified_estimates", "tradeoff_articulation", "failure_design", "pivot_on_constraint", "concrete_api_data"]
+  },
+  "delivery": "multi-turn",
+  "evals": [
+    {
+      "id": "url-shortener",
+      "title": "URL shortener",
+      "leads_with": ["data-storage", "sequencer", "caching"],
+      "should_compose": ["requirements-scoping", "back-of-the-envelope", "api-design", "data-storage", "sequencer", "caching"],
+      "turns": [
+        "Design a URL shortener — short link in, original URL out, with redirects.",
+        "Now it's billions of reads/day and ~10k new links/sec. Where does your first design break, and how do you generate the short keys at that rate?",
+        "Add custom vanity aliases and per-link click analytics. What changes?"
+      ],
+      "assertions": [
+        "clarifies read:write ratio and latency target before designing (clarify_first)",
+        "computes key space / QPS / storage with back-of-the-envelope (quantified_estimates)",
+        "chooses a key-generation approach (counter+base62 / hash / Snowflake) WITH solves/worsens/when-to-change, routing to `sequencer` (tradeoff_articulation + composition)",
+        "uses `caching` for the read-heavy redirect path and `data-storage` for the KV mapping (composition)",
+        "on turn 2, names what breaks first (single DB write/QPS) and re-sizes, not just 'add servers' (pivot_on_constraint)",
+        "gives a concrete key schema + redirect status (301 vs 302) decision (concrete_api_data)"
+      ]
+    },
+    {
+      "id": "rate-limiter",
+      "title": "Distributed rate limiter",
+      "leads_with": ["resilience-failure", "sharded-counters", "api-design"],
+      "should_compose": ["requirements-scoping", "resilience-failure", "sharded-counters", "api-design", "back-of-the-envelope"],
+      "turns": [
+        "Design a rate limiter for our public API.",
+        "It must run across 100 gateway nodes handling 1M req/s total, with a shared global limit per API key. How do you keep the counts accurate without a hot key?",
+        "Add tiered limits: per-user, per-IP, and a global ceiling, each with different windows."
+      ],
+      "assertions": [
+        "picks an algorithm (token bucket / sliding window) with trade-offs, routing to `resilience-failure` (tradeoff_articulation + composition)",
+        "addresses the shared-count hot-key problem via `sharded-counters` (composition + failure_design)",
+        "specifies the 429 + Retry-After contract via `api-design` (concrete_api_data)",
+        "on turn 2, recognizes the central-counter bottleneck and shards/relaxes to eventual counts (pivot_on_constraint)"
+      ]
+    },
+    {
+      "id": "news-feed",
+      "title": "News feed / timeline",
+      "leads_with": ["content-delivery", "messaging-streaming", "caching", "data-storage"],
+      "should_compose": ["requirements-scoping", "back-of-the-envelope", "messaging-streaming", "caching", "data-storage", "content-delivery", "consistency-coordination"],
+      "turns": [
+        "Design a social news feed: users post, and see friends' recent posts.",
+        "One user is a celebrity with 50M followers. What happens to your fan-out, and how do you fix it?",
+        "Posts now include images and video. How are they stored and delivered?"
+      ],
+      "assertions": [
+        "establishes read-heavy ratio with numbers, justifying caching/precompute (quantified_estimates)",
+        "chooses fan-out-on-write vs read with trade-offs via `messaging-streaming` + `caching` (tradeoff_articulation + composition)",
+        "on turn 2, names the write-amplification breaking point and pivots to a hybrid push/pull (pivot_on_constraint)",
+        "on turn 3, routes media to `blob-store` + `content-delivery` rather than the message path (composition + coverage-sweep)"
+      ]
+    },
+    {
+      "id": "observability-pipeline",
+      "title": "Metrics + logging pipeline",
+      "leads_with": ["observability", "distributed-logging", "blob-store"],
+      "should_compose": ["requirements-scoping", "back-of-the-envelope", "observability", "distributed-logging", "messaging-streaming", "blob-store"],
+      "turns": [
+        "Design the telemetry backend for our platform — metrics, logs, and traces from thousands of services.",
+        "It's now 10M events/sec with 1-year retention for logs. How do you ingest that without dropping data, and where do old logs live?",
+        "Add alerting and SLO/error-budget tracking on top."
+      ],
+      "assertions": [
+        "separates the three pillars and routes the log PIPELINE to `distributed-logging` vs the metrics/alerting/SLOs to `observability` (composition + DRY boundary)",
+        "uses `messaging-streaming` for buffered ingest with backpressure/DLQ (failure_design)",
+        "tiers old logs to `blob-store` cold storage (composition + quantified_estimates on retention)",
+        "on turn 3, defines SLI/SLO + error budget + alerting via `observability` (concrete_api_data)"
+      ]
+    },
+    {
+      "id": "typeahead-search",
+      "title": "Search autocomplete (typeahead)",
+      "leads_with": ["distributed-search", "caching", "data-storage"],
+      "should_compose": ["requirements-scoping", "back-of-the-envelope", "distributed-search", "caching", "data-storage"],
+      "turns": [
+        "Design search autocomplete that suggests queries as the user types.",
+        "Billions of queries/day, p99 under 100 ms, suggestions ranked by popularity. How?",
+        "Suggestions must reflect trending terms within minutes and be personalized."
+      ],
+      "assertions": [
+        "routes to `distributed-search` for the index/trie + top-k, not a DB LIKE scan (composition + tradeoff_articulation)",
+        "uses `caching` for hot prefixes and sizes the latency budget (quantified_estimates)",
+        "on turn 3, separates near-real-time index updates from the serving path (pivot_on_constraint + failure_design)"
+      ]
+    },
+    {
+      "id": "whatsapp",
+      "title": "WhatsApp messaging (3 rounds)",
+      "leads_with": ["messaging-streaming", "data-storage", "consistency-coordination"],
+      "should_compose": ["requirements-scoping", "back-of-the-envelope", "api-design", "data-storage", "messaging-streaming", "consistency-coordination", "sequencer", "resilience-failure"],
+      "turns": [
+        "Design the backend for WhatsApp-like messaging: data model, end-to-end delivery, online vs offline recipients.",
+        "Now 1B users, 100B messages/day (~1.15M msg/sec peak). Where does your design break first, and how do you fan out group chats of 1,000 members?",
+        "Pick one and go deep: exactly-once delivery, multi-device message ordering, or E2E key distribution at scale."
+      ],
+      "assertions": [
+        "see meta/evals/iteration-1/SUMMARY.md for the established baseline (with-skill 30/30 vs baseline 20/30); regression: scores must not drop and the iteration-1 gaps (media path, state convergence, retention sizing) should improve",
+        "on turn 2, ranks where Round-1 breaks first and re-sizes with BOTEC (pivot_on_constraint)",
+        "composes `sequencer` for message IDs and `consistency-coordination` for ordering (composition)"
+      ]
+    }
+  ]
+}
