@@ -62,6 +62,7 @@ is how composition works at runtime: a bare skill name below is a skill to
 | What features / constraints / scope? | `requirements-scoping` |
 | How many QPS, how much storage, how many servers? | `back-of-the-envelope` |
 | Endpoints, request/response, pagination, idempotency | `api-design` |
+| Monolith vs microservices, service boundaries, gateway, discovery | `service-decomposition` |
 | SQL vs NoSQL, schema, indexing, sharding, replication | `data-storage` |
 | What to cache, eviction, invalidation, hot keys | `caching` |
 | Distributing traffic, L4/L7, health checks | `load-balancing` |

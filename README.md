@@ -6,7 +6,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Plugin-blueviolet)](https://code.claude.com/docs/en/plugins)
-[![Skills](https://img.shields.io/badge/Building_Blocks-21_Skills-brightgreen)](#building-blocks)
+[![Skills](https://img.shields.io/badge/Building_Blocks-22_Skills-brightgreen)](#building-blocks)
 [![Self-contained](https://img.shields.io/badge/Runtime_deps-none-success)](#design-principle)
 [![Providers](https://img.shields.io/badge/Providers-AWS%20%C2%B7%20Azure%20%C2%B7%20GCP%20%C2%B7%20Temporal-blue)](#provider-modularity)
 
@@ -34,7 +34,7 @@ flowchart TB
       direction TB
       L0["L0 Frame &nbsp;· requirements-scoping · back-of-the-envelope"]
       L1["L1 Edge &nbsp;&nbsp;· dns · load-balancing · content-delivery"]
-      L2["L2 Contract · api-design"]
+      L2["L2 Services · api-design · service-decomposition"]
       L3["L3 State &nbsp;· data-storage · caching · blob-store · sequencer · sharded-counters · distributed-search"]
       L4["L4 Async &nbsp;· messaging-streaming · task-scheduling"]
       L5["L5 Correctness · consistency-coordination"]
@@ -121,19 +121,21 @@ Claude runs the full loop — clarifies scope, sizes it with back-of-the-envelop
 
 1. **Run the workflow.** `/design <system>` runs the whole process (or dispatches to the **`system-design-orchestrator`** agent). Best for full designs and interview practice — it scores the result against the GUIDE quality bar and persists the design doc.
 2. **Start a design conversationally.** Trigger the **system-design** orchestrator skill ("design WhatsApp-scale messaging"); it runs the same loop and routes to the blocks.
+> **Preparing for an interview?** [`docs/study-path.md`](docs/study-path.md) sequences the plugin into a learn → drill → self-test path (method, numbers, building-block syllabus, mistakes checklist, and the practice bank).
+
 3. **Reason about one part.** Trigger a building block directly ("what caching strategy here?", "SQL or NoSQL for this?", "how do I shard this table?") — the recipe, trade-offs, and provider variants for just that part.
 
 ---
 
 ## Building blocks
 
-21 skills: an orchestrator, a diagram engine, and 19 building blocks arranged **bottom-up** so each layer depends only on the ones beneath it.
+22 skills: an orchestrator, a diagram engine, and 20 building blocks arranged **bottom-up** so each layer depends only on the ones beneath it.
 
 | Layer | Blocks | What they decide |
 |:------|:-------|:-----------------|
 | **L0 Frame** | `requirements-scoping` · `back-of-the-envelope` | what to build, how big |
 | **L1 Edge** | `dns` · `load-balancing` · `content-delivery` | get traffic in, served close |
-| **L2 Contract** | `api-design` | the interface boundary |
+| **L2 Services** | `api-design` · `service-decomposition` | the interface boundary + how the system is split into services |
 | **L3 State** | `data-storage` · `caching` · `blob-store` · `sequencer` · `sharded-counters` · `distributed-search` | store it, read it fast |
 | **L4 Async** | `messaging-streaming` · `task-scheduling` | decouple, schedule, absorb spikes |
 | **L5 Correctness** | `consistency-coordination` | CAP, ordering, consensus |
@@ -212,7 +214,7 @@ A realistic eval harness measures whether the skills make Claude design *better*
 
 - **Eval set** — `meta/evals/evals.json`: multi-turn exercises (URL shortener, rate limiter, news feed, observability pipeline, typeahead, WhatsApp) that each lead with different blocks. Scored on 6 GUIDE behaviors (clarify / quantify / trade-offs / failure / pivot / concrete-API) + a composition check.
 - **Trigger evals** — `meta/evals/trigger-evals.json`: ~20 should / should-not routing queries.
-- **Run a comparison** (with-skill vs baseline, then a judge): see `meta/evals/whatsapp-eval.workflow.js`. The first run (`meta/evals/iteration-1/`) scored **with-skill 30/30 vs baseline 20/30** with composition confirmed real.
+- **Run a comparison** (with-skill vs baseline, then a judge) — the method is in `meta/evals/README.md`; run it with whatever orchestration you have. The first run (`meta/evals/iteration-1/`) scored **with-skill 30/30 vs baseline 20/30** with composition confirmed real.
 - **Deterministic check** (the one objectively-scriptable surface):
   ```bash
   python3 skills/back-of-the-envelope/scripts/test_botec.py   # asserts calculator == golden fixture
@@ -235,13 +237,16 @@ system-design-skills/
 │   └── design.md                    # /design <system> — runs the workflow
 ├── skills/
 │   ├── system-design/               # ORCHESTRATOR — reasoning loop + routing + templates
-│   ├── <19 building blocks>/        # SKILL.md + references/ (+ providers/ for component blocks)
+│   ├── <20 building blocks>/        # SKILL.md + references/ (+ providers/ for component blocks)
 │   └── architecture-diagram/        # DIAGRAM ENGINE — self-contained HTML+SVG
-├── meta/                            # maintainer docs (not skills)
+├── docs/                            # shared, in-repo references (not skills)
+│   ├── GUIDE.md                     #   the ten failure modes (source of the method)
+│   ├── study-path.md                #   interview-prep study path (links the pieces)
+│   └── hero.png                     #   README banner
+├── meta/                            # maintainer docs + eval set (not skills)
 │   ├── SKILL-CONTRACT.md            #   the authoring contract every block follows
 │   ├── PLAN.md                      #   creation plan + status
-│   ├── *.workflow.js                #   authoring / eval / research workflows
-│   └── evals/                       #   realistic eval set + results
+│   └── evals/                       #   realistic eval set + results (evals.json, iteration-1/)
 ├── LICENSE
 └── README.md
 ```
@@ -275,7 +280,7 @@ Built on the shoulders of the best system-design resources:
 - [*System Design Interview*](https://bytebytego.com/) (Alex Xu / ByteByteGo) — the four-step process and back-of-the-envelope numbers
 - *Grokking Modern System Design* — the bottom-up building-block catalog
 - [*Designing Data-Intensive Applications*](https://dataintensive.net/) (Martin Kleppmann) — data-systems fundamentals
-- The project's `GUIDE.md` — the ten failure modes that shape the reasoning loop
+- [`docs/GUIDE.md`](docs/GUIDE.md) — the ten system-design failure modes that shape the reasoning loop (condensed, runtime version embedded in `skills/system-design/references/failure-modes.md`)
 
 ---
 

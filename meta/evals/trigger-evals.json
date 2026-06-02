@@ -22,6 +22,10 @@
     {"q": "write a python function to reverse a linked list", "should_trigger": false, "route_to": null, "why": "algorithm coding, not system design"},
     {"q": "my react component re-renders too often, how do i memoize it", "should_trigger": false, "route_to": null, "why": "front-end perf, adjacent domain, out of scope"},
     {"q": "what's the difference between a process and a thread", "should_trigger": false, "route_to": null, "why": "OS concept; near-miss on 'distributed' vocab but not a design task"},
-    {"q": "rename the variable foo to userCount across this file", "should_trigger": false, "route_to": null, "why": "refactor, not design"}
+    {"q": "rename the variable foo to userCount across this file", "should_trigger": false, "route_to": null, "why": "refactor, not design"},
+    {"q": "should we break this monolith into microservices, and how fine-grained?", "should_trigger": true, "route_to": "service-decomposition", "why": "monolith-vs-microservices + granularity is service-decomposition (it owns the boundary decision + the too-many/too-small counter-force)"},
+    {"q": "where should the service boundaries be, and do we need an API gateway and service discovery?", "should_trigger": true, "route_to": "service-decomposition", "why": "boundaries + gateway + discovery are owned by service-decomposition"},
+    {"q": "should the order service call the payment service synchronously or via an event?", "should_trigger": true, "route_to": "service-decomposition", "why": "sync-vs-async PER SEAM is the boundary decision; if async, it then invokes messaging-streaming for delivery semantics"},
+    {"q": "what delivery guarantee and should I use a queue or a Kafka stream between these services?", "should_trigger": true, "route_to": "messaging-streaming", "why": "delivery guarantees / queue-vs-stream / DLQ are owned by messaging-streaming, NOT service-decomposition — the near-miss must route here"}
   ]
 }

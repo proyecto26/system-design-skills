@@ -1,7 +1,7 @@
 {
   "_about": "Realistic eval set for the system-design-skills plugin. Single home for exercises — the eval workflow READS from here (don't inline exercises in the workflow JS). Each exercise LEADS WITH different building blocks so coverage spans the catalog, and is MULTI-TURN: deliver turns sequentially (answer turn 1, THEN inject turn 2's constraint) so pivot_on_constraint and collaboration are tested honestly rather than pre-planned.",
   "rubric": {
-    "_reuse": "Do NOT re-author a rubric. Score each turn's cumulative design on the SAME 6 behaviors used in whatsapp-eval.workflow.js, 0-5 each (total /30).",
+    "_reuse": "Do NOT re-author a rubric. Score each turn's cumulative design on the SAME 6 behaviors listed below (and in meta/evals/README.md), 0-5 each (total /30).",
     "behaviors": ["clarify_first", "quantified_estimates", "tradeoff_articulation", "failure_design", "pivot_on_constraint", "concrete_api_data"]
   },
   "delivery": "multi-turn",

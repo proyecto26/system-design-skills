@@ -75,8 +75,10 @@ mesh of queues, state flags, and cron jobs.
 
 Delivery semantics cut across all of these: **at-most-once** (fire and forget,
 may drop), **at-least-once** (retries until acked, may duplicate — the practical
-default), **exactly-once** (no loss, no dup — expensive, usually approximated with
-at-least-once delivery plus idempotent/deduped consumers). See
+default), **exactly-once** (no loss, no dup). True end-to-end exactly-once is
+impractical: a broker's "EOS" (e.g. Kafka) is **intra-cluster only**, so across
+systems you always implement it as **at-least-once + idempotent/deduped
+consumers** (→ `api-design` idempotency keys). See
 `references/deep-dive.md` for the mechanics.
 
 ## Trade-offs

@@ -192,6 +192,7 @@ a dashed/broken arrow) is fine for quick reasoning; do not embed Mermaid.
 - `resilience-failure` — *feeds into* this: it owns failover, retries, and graceful degradation; this block prices the consistency cost of the availability mechanics it provides.
 - `caching` — *depends on* consistent hashing (the owned-concept lives here) to shard a distributed cache, and trades freshness for speed.
 - `back-of-the-envelope` — *owned-concept lives in* it: the latency table and availability-nines math used to price round trips and size `N`.
+- `service-decomposition` — *depends on* this for cross-service consistency (saga/2PC) and for the coordination behind **service discovery** (leader election, etcd/Consul/ZooKeeper).
 - `system-design` — the orchestrator that *routes here* when a design replicates or coordinates state.
 
 ## References

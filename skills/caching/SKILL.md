@@ -145,7 +145,7 @@ dashed arrow.
 
 ## Related building blocks
 - `content-delivery` — *pairs with* this as the edge layer above it; CDN/edge caching for static and media (that concept lives there).
-- `data-storage` — *depends on* this as the origin a cache protects; its read replicas are an *alternative to* caching reads, and sharding/consistent-hashing for cache nodes is *owned* there.
+- `data-storage` — *depends on* this as the origin a cache protects; its read replicas are an *alternative to* caching reads, and cache-node sharding mirrors its partitioning. (Consistent-hashing theory is *owned by* `consistency-coordination`.)
 - `consistency-coordination` — *pairs with* this when staleness is unacceptable and read-your-writes or stronger guarantees are required.
 - `back-of-the-envelope` — *feeds into* this skill: it supplies the read ratio and hot-set size that justify a cache.
 - `resilience-failure` — *pairs with* this; rate limiting and circuit breakers (*owned* there) help contain the retry storms a misbehaving cache can trigger.

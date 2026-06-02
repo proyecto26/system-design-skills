@@ -1,0 +1,22 @@
+name: checks
+
+# Portable, machine-independent eval/CI gate for the plugin.
+# Runs the stdlib-only self-locating checker — BOTEC golden fixture,
+# eval-data integrity, and the self-containment invariant (no machine paths).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Run portable checks
+        run: python3 meta/evals/run_checks.py

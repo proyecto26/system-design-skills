@@ -62,7 +62,7 @@ The two that drive most decisions:
 | Key-value store node | ~**10,000** QPS |
 | Cache server (Redis/Memcached) | ~**100,000–1M** QPS |
 | One modern CPU core | ~**1,000** simple requests/s → a 64-core box ≈ **64k** req/s |
-| Read 1 MB: memory vs SSD vs disk | ~**μs vs tens of μs vs ms** (memory ≫ SSD ≫ disk) |
+| Read 1 MB: memory vs SSD vs disk | ~**μs vs tens–hundreds of μs vs ms** (memory ≫ SSD ≫ disk) |
 
 **Think in orders of magnitude, not exact values.** CPU-bound work is ~1×,
 memory-bound ~10×, IO-bound ~100× the time. That ratio, not the decimals, is what

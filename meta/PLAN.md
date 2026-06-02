@@ -1,7 +1,7 @@
 # Creation plan — system-design-skills plugin
 
 > **Status (current):** This plan has been executed and extended. The plugin now
-> ships **21 skills** (orchestrator + diagram engine + 3 method + 16 component
+> ships **22 skills** (orchestrator + diagram engine + 3 method + 17 component
 > blocks — the full bottom-up catalog), a **`system-design-orchestrator` agent**,
 > and a **`/design` command**, plus eval realism artifacts under `meta/evals/`.
 > The canonical, always-current inventory is the ownership map in
@@ -18,8 +18,8 @@ authored skills and `SKILL-CONTRACT.md`) to judge it.
 ## 1. Goal & philosophy
 
 A Claude Code plugin that helps Claude approach **system-design problems by
-reasoning, not by recalling memorized architectures.** Grounded in a guide (the
-project's `GUIDE.md`) cataloging the ten ways strong engineers fail design
+reasoning, not by recalling memorized architectures.** Grounded in a guide
+(`docs/GUIDE.md`) cataloging the ten ways strong engineers fail design
 discussions — almost always *signal* failures (naming tools without trade-offs,
 no numbers, ignoring failure modes, defending a memorized diagram), not "wrong
 answers."
@@ -94,11 +94,11 @@ service.
 
 ## 6. Source material
 
-Authoring mines the project's corpus (the System Design Primer, "Scale from Zero
-to Millions", `SYSTEM_CAPACITY.md` for BOTEC numbers, the deep design docs for
-chat/rate-limiter/consistent-hashing/leaderboard/etc., and `GUIDE.md`), plus
-Claude's own distributed-systems knowledge (the GUIDE explicitly wants reasoning
-beyond the docs).
+Authoring drew on established system-design references (the System Design Primer,
+Alex Xu's interview framework, "Scale from Zero to Millions", and the in-repo
+`docs/GUIDE.md`) plus Claude's own distributed-systems knowledge — the guide
+explicitly wants reasoning beyond any single source. (Those external works are
+credited in the README; none are referenced as files by the shipped plugin.)
 
 ## 7. Build approach
 

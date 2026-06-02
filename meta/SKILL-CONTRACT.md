@@ -2,7 +2,9 @@
 
 This is the shared shape that **every building-block skill** in this plugin
 follows. It exists so the blocks compose cleanly, trigger predictably, and bake
-the GUIDE.md failure-mode defenses into the design conversation by construction.
+the failure-mode defenses (the ten failure modes — see `docs/GUIDE.md`, with the
+condensed runtime version in `skills/system-design/references/failure-modes.md`)
+into the design conversation by construction.
 
 The orchestrator skill (`system-design`) is exempt — it defines the method and
 routes to blocks. Everything else follows this contract. Use `skills/caching/`
@@ -282,6 +284,7 @@ agents) must obey this map.
 | High-volume **log pipeline** (collect→buffer→ship→index→retain), structured logs, correlation IDs | `distributed-logging` | name + link |
 | Distributed task scheduling (cron/delayed/recurring), worker leasing, priorities/fairness, task dedup | `task-scheduling` | name + link |
 | Sharded/striped counters, write-contention avoidance, approximate counting (HyperLogLog) | `sharded-counters` | name + link |
+| Monolith vs microservices, service boundaries/granularity, API gateway/BFF, service discovery, service mesh, sync-vs-async between services | `service-decomposition` | name + link |
 | Diagram generation (HTML+SVG) | `architecture-diagram` | point to it |
 
 Two boundaries to respect among the new blocks: **`observability` owns *what* to

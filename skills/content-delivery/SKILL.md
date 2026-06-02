@@ -1,6 +1,6 @@
 ---
 name: content-delivery
-description: This skill should be used when the user asks about a "CDN", "edge caching", "static asset delivery", "media / video delivery", "geo distribution" or "geo-routing", "push vs pull CDN", "cache-control headers" / "TTL for static assets", "origin offload", or "origin shield". It gives the recipe for serving bytes from the edge close to users. Use it whenever a design serves images, video, JS/CSS, or downloads to a wide geography, or the origin is saturated by repeat reads of the same files, even if the user doesn't say "CDN".
+description: This skill should be used when the user asks about a "CDN", "edge caching", "static asset delivery", "media / video delivery", "geo distribution of content" or "edge POP selection", "push vs pull CDN", "cache-control headers" / "TTL for static assets", "origin offload", or "origin shield". It gives the recipe for serving bytes from the edge close to users. Use it whenever a design serves images, video, JS/CSS, or downloads to a wide geography, or the origin is saturated by repeat reads of the same files, even if the user doesn't say "CDN".
 ---
 
 # Content Delivery
