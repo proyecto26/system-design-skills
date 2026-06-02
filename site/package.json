@@ -1,0 +1,21 @@
+{
+  "name": "system-design-skills-site",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Onboarding presentation for the system-design-skills Claude Code plugin.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@xyflow/react": "^12.3.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}
