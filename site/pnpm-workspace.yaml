@@ -1,0 +1,8 @@
+# pnpm 11 settings home.
+# 1) Allow Vite's esbuild to run its install script (fetch its native binary).
+onlyBuiltDependencies:
+  - esbuild
+# 2) Don't run a synchronous `pnpm install` before every `pnpm run <script>`
+#    (pnpm 11.5.1 crashes that pre-check on the ignored-builds notice). Vite
+#    itself runs fine; deps are managed explicitly via `pnpm install`.
+verifyDepsBeforeRun: false
