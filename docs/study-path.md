@@ -44,8 +44,8 @@ a monolith / modular monolith (GUIDE #7).
   shortener, rate limiter, news feed, observability pipeline, typeahead, WhatsApp),
   each with the building blocks it *should* compose and what-good-looks-like
   assertions. Deliver the turns one at a time (don't read ahead), design your
-  answer, then **self-score with the same 6-behavior / 0–5 bar** from
-  `failure-modes.md`. A fully worked reference answer + baseline lives in
+  answer, then **self-score with the same 7-behavior / 0–5 bar** (composition
+  included) from `failure-modes.md`. A fully worked reference answer + baseline lives in
   `meta/evals/iteration-1/`.
 - See `meta/evals/README.md` for how to run a rigorous (with-skill vs baseline)
   comparison.

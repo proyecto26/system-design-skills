@@ -1,0 +1,23 @@
+{
+  "_about": "Judge negative-control — calibration, not a skill test. A rubric that scores every answer at the ceiling measures nothing, so before trusting a judged iteration we confirm the judge can SEPARATE a strong answer from a deliberately weak one on the same prompt. Run both through the same judge+rubric used for evals.json; the judge passes calibration only if the strong control lands in its expected_total band and the weak control lands in its (disjoint, lower) band. If the judge can't tell them apart, its scores on the real exercises are noise and the iteration is void. run_checks.py validates the data shape (both polarities present, bands disjoint); the actual ranking is graded in the agent-driven harness (README).",
+  "rubric_ref": "evals.json#rubric (same 7 behaviors incl. composition, 0-5 each, /35)",
+  "prompt": "Design a distributed rate limiter for our public API. It must run across 100 gateway nodes handling 1M req/s total, with a shared global limit per API key.",
+  "controls": [
+    {
+      "id": "rate-limiter-strong",
+      "polarity": "strong",
+      "expected_total_min": 28,
+      "expected_total_max": 35,
+      "why_this_band": "Hits every behavior the GUIDE rewards: clarifies, quantifies, names the central-counter bottleneck and pivots, specifies the wire contract, AND composes the owning blocks (resilience-failure, sharded-counters, api-design, back-of-the-envelope) — so it earns the now-folded-in composition points too. On the /35 rubric a correctly-calibrated judge should not score this below 28.",
+      "answer": "Clarify first: is the limit hard or soft, what's the window (fixed/sliding), is a small over-count acceptable for availability, and what p99 budget does the limiter check add? Assume soft-ish global limit, sliding window, ~1ms budget. Numbers: 1M req/s across 100 nodes = ~10k req/s/node; a single global counter in Redis at 1M incr/s is the bottleneck and a hot key. Design: token-bucket per API key, counts sharded across N Redis shards by hash(key) so no single key is globally hot, each gateway holds a short-lived local lease (e.g. fetch a batch of tokens, decrement locally, refill async) so the common path is in-memory and only refills cross the network — this trades a bounded over-count for availability and latency. solves: removes the per-request central round trip and the hot key. worsens: counts are now eventually-consistent (brief over-admission at burst). when-to-change: if the limit must be exact, fall back to a synchronous atomic check on the hot path and accept the latency. Failure: if Redis shard is unreachable, fail-open (serve) for a soft limit or fail-closed for abuse protection — state which and why; add jitter so leases don't all refill in lockstep. Contract: on reject return 429 with Retry-After and X-RateLimit-Remaining/Reset headers. Composes: resilience-failure (algorithm), sharded-counters (hot-key count), api-design (429 contract), back-of-the-envelope (the per-node math)."
+    },
+    {
+      "id": "rate-limiter-weak",
+      "polarity": "weak",
+      "expected_total_max": 14,
+      "expected_total_min": 0,
+      "why_this_band": "Deliberately bad: no clarifying questions, no numbers, the single-global-counter design IS the hot-key bottleneck the prompt asks to avoid, no failure handling, no contract, no composition (it names no owning block, so composition scores ~0). If a judge scores this above 14 on the /35 rubric it is not discriminating and any top score it awards elsewhere is suspect.",
+      "answer": "Just use Redis. Keep one counter per API key in Redis and INCR it on every request; if it's over the limit, block the request. Redis is fast and scales, so 1M req/s is fine. Put it behind a load balancer and you're done. If it gets slow later we can add more Redis."
+    }
+  ]
+}

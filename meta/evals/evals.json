@@ -1,8 +1,9 @@
 {
   "_about": "Realistic eval set for the system-design-skills plugin. Single home for exercises — the eval workflow READS from here (don't inline exercises in the workflow JS). Each exercise LEADS WITH different building blocks so coverage spans the catalog, and is MULTI-TURN: deliver turns sequentially (answer turn 1, THEN inject turn 2's constraint) so pivot_on_constraint and collaboration are tested honestly rather than pre-planned.",
   "rubric": {
-    "_reuse": "Do NOT re-author a rubric. Score each turn's cumulative design on the SAME 6 behaviors listed below (and in meta/evals/README.md), 0-5 each (total /30).",
-    "behaviors": ["clarify_first", "quantified_estimates", "tradeoff_articulation", "failure_design", "pivot_on_constraint", "concrete_api_data"]
+    "_reuse": "Do NOT re-author a rubric. Score each turn's cumulative design on the SAME 7 behaviors listed below (and in meta/evals/README.md), 0-5 each (total /35).",
+    "_composition_note": "composition was scored separately (off-total) through iteration-3; it is now folded into the total because it is the plugin's distinctive signal (with-skill consistently 5, baseline 0-1) and excluding it understated the skill's lift. Grade composition by VERIFYING the answer invoked the owning building-block skills (cited their SKILL.md content) rather than paraphrasing from memory — a baseline with no skill access should score low here by construction.",
+    "behaviors": ["clarify_first", "quantified_estimates", "tradeoff_articulation", "failure_design", "pivot_on_constraint", "concrete_api_data", "composition"]
   },
   "delivery": "multi-turn",
   "evals": [
@@ -106,6 +107,25 @@
         "see meta/evals/iteration-1/SUMMARY.md for the established baseline (with-skill 30/30 vs baseline 20/30); regression: scores must not drop and the iteration-1 gaps (media path, state convergence, retention sizing) should improve",
         "on turn 2, ranks where Round-1 breaks first and re-sizes with BOTEC (pivot_on_constraint)",
         "composes `sequencer` for message IDs and `consistency-coordination` for ordering (composition)"
+      ]
+    },
+    {
+      "id": "over-decomposition-trap",
+      "title": "Order management — the over-decomposition trap (ceiling-breaker)",
+      "_purpose": "Designed so a microservices-by-default answer should LOSE points, not earn a top score. The obvious composition (split into many services + Kafka everywhere + multi-region) is the WRONG first move at the stated scale; the GUIDE #7 / service-decomposition counter-force is the load-bearing behavior. This breaks the ceiling that pinned earlier exercises at full marks by making the 'impressive' answer the failing one.",
+      "leads_with": ["service-decomposition", "scaling-evolution"],
+      "should_compose": ["requirements-scoping", "back-of-the-envelope", "service-decomposition", "data-storage", "scaling-evolution"],
+      "turns": [
+        "We're a 6-engineer startup with ~2k orders/day. Design the backend for order management (place order, track status, basic inventory). Our CTO wants to start with microservices so we 'scale like the big companies' — lay out the architecture.",
+        "Two years in: 8M orders/day, the inventory team and the fulfilment team now deploy on different cadences and keep blocking each other, and inventory writes are ~100x the order writes. What changes — and which of your turn-1 decisions do you now reverse?",
+        "A customer was double-charged once. Make payment exactly correct end-to-end."
+      ],
+      "assertions": [
+        "turn 1: REJECTS or right-sizes microservices-by-default — recommends a modular monolith / well-seamed single deployable at 2k orders/day and 6 engineers, naming the distributed-systems tax (network failure, eventual consistency, ops overhead) as the reason (tradeoff_articulation + pivot_on_constraint; this is the falsification behavior — a generic 'split into order/inventory/payment/notification services' answer should SCORE LOW here)",
+        "turn 1: ties the recommendation to numbers — 2k/day is ~0.02 writes/s, nowhere near a scale driver — rather than asserting it (quantified_estimates)",
+        "turn 2: identifies the REAL seams that now justify a split (independent deploy cadence between teams + the ~100x inventory/order write asymmetry), and explicitly reverses the turn-1 monolith for THOSE seams only — not a full shatter into services (pivot_on_constraint + service-decomposition counter-force)",
+        "turn 2: routes the write-rate asymmetry through back-of-the-envelope + data-storage (scale the hot path, not everything) and uses scaling-evolution for the migration order (composition)",
+        "turn 3: the exactly-once requirement cascades — api-design idempotency key -> data-storage atomic write/append-only ledger -> consistency-coordination (saga, not 2PC) -> messaging-streaming (outbox + at-least-once + dedupe) -> resilience-failure (fail-closed + reconciliation); a one-block answer is incomplete (concrete_api_data + failure_design + composition)"
       ]
     }
   ]
