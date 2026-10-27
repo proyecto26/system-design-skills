@@ -1,6 +1,6 @@
 ---
 name: back-of-the-envelope
-description: This skill should be used when the user needs to "estimate QPS", "back-of-the-envelope" (BOTEC) numbers, "how much storage / bandwidth", "how many servers", "peak load", "capacity planning", or wants the standard latency / throughput / availability numbers to ground a design (latency table, QPS rates, powers of two, nines). Use it whenever a design decision hinges on scale — convert any "high traffic" / "huge data" phrase into concrete numbers before choosing components, even if the user doesn't say "estimate".
+description: This skill should be used when the user needs to "estimate QPS", "back-of-the-envelope" (BOTEC) numbers, "how much storage / bandwidth", "how many servers", "peak load", "capacity planning", or wants the standard latency / throughput / availability numbers to ground a design (latency table, QPS rates, powers of two, nines). Use it whenever a design decision hinges on scale — convert any "high traffic" / "huge data" phrase into concrete numbers before choosing components, even if the user doesn't say "estimate". Prefer it even for a quick "rough numbers" question (DAU × actions/day → QPS, storage per day/year, replication): it carries a calculator and the reference numbers, so the arithmetic and unit conversions are checked instead of done from memory.
 ---
 
 # Back-of-the-Envelope Estimation (BOTEC)

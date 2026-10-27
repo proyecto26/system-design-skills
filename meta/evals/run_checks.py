@@ -21,6 +21,9 @@ Checks:
      return (README principle #6: every gap becomes an assertion). Covers the
      catalog-count invariant, /design routing, the service-decomposition
      anti-microservices stance, and its corrected latency math.
+  5. Manifest consistency — the Agent Plugins root plugin.json, the Codex and
+     Claude Code manifests, and both marketplace catalogs agree on name/version/
+     description and install wiring; plugin.json obeys the closed 1.0.0 schema.
 
 Exit code 0 if all pass, 1 otherwise.
 """
@@ -132,6 +135,8 @@ def check_self_contained():
                 continue
             full = os.path.join(dirpath, fn)
             rel = os.path.relpath(full, ROOT)
+            if rel.startswith(os.path.join("evals", "results") + os.sep):
+                continue  # local `claude plugin eval` output (gitignored), not committed
             if rel == os.path.join("meta", "evals", "run_checks.py"):
                 continue  # this file documents the patterns it forbids
             try:
@@ -222,6 +227,83 @@ def check_regressions():
         failures.append(f"regression/latency: {e}")
         fail(f"Regression — latency math ({e})")
 
+    # --- trade-off discipline must be VISIBLE in answers. `claude plugin eval`
+    # (evals/*/graders/tradeoff-discipline.md) failed in BOTH arms until the
+    # orchestrator carried an answer contract and every component block ended
+    # its How-to-apply with "show the trade-off in the answer".
+    try:
+        sd = _read(os.path.join("skills", "system-design", "SKILL.md"))
+        assert "## Answer contract" in sd and "Change it when" in sd, (
+            "system-design lost its Answer contract (decisions table + weakest point)")
+        missing = [
+            d for d in sorted(os.listdir(os.path.join(ROOT, "skills")))
+            if "## How to apply" in (txt := _read(os.path.join("skills", d, "SKILL.md")))
+            and "Show the trade-off in the answer" not in txt
+        ]
+        assert not missing, f"How-to-apply lacks the 'show the trade-off' step: {missing}"
+        ok("Regression — answer contract + per-block 'show the trade-off' step present")
+    except Exception as e:
+        failures.append(f"regression/answer-contract: {e}")
+        fail(f"Regression — answer contract ({e})")
+
+
+_AGENT_PLUGINS_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
+_AGENT_PLUGINS_FIELDS = {"$schema", "name", "version", "description", "author", "homepage",
+                         "repository", "license", "keywords", "extensions"}
+_AGENT_PLUGINS_NAME = re.compile(r"^(?!.*(?:--|\.\.))[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$")
+
+
+def check_manifests():
+    """5. Every host manifest agrees on plugin identity and install wiring.
+
+    plugin.json (Agent Plugins 1.0 — Cursor, Copilot CLI), .codex-plugin/plugin.json
+    (OpenAI Codex), .claude-plugin/ (Claude Code) and .agents/plugins/marketplace.json
+    (Codex catalog) are hand-maintained copies; this keeps them from drifting. The
+    root manifest is checked against the closed Agent Plugins 1.0.0 schema rules
+    offline (no jsonschema / network), so CI stays stdlib-only.
+    """
+    try:
+        load = lambda rel: json.loads(_read(rel))
+        root = load("plugin.json")
+        codex = load(os.path.join(".codex-plugin", "plugin.json"))
+        claude = load(os.path.join(".claude-plugin", "plugin.json"))
+        claude_mp = load(os.path.join(".claude-plugin", "marketplace.json"))
+        codex_mp = load(os.path.join(".agents", "plugins", "marketplace.json"))
+        name = root.get("name")
+
+        # Agent Plugins 1.0.0: closed schema, required $schema const + name pattern
+        assert root.get("$schema") == _AGENT_PLUGINS_SCHEMA, "plugin.json $schema is not Agent Plugins 1.0.0"
+        extra = set(root) - _AGENT_PLUGINS_FIELDS
+        assert not extra, f"plugin.json has fields outside the Agent Plugins schema: {sorted(extra)}"
+        assert isinstance(name, str) and len(name) <= 64 and _AGENT_PLUGINS_NAME.match(name), (
+            f"plugin.json name {name!r} violates the Agent Plugins name pattern")
+        assert set(root.get("author", {})) <= {"name", "email", "url"}, "plugin.json author has extra keys"
+
+        # identity: name + version everywhere, description across the plugin manifests
+        entry = next((p for p in claude_mp.get("plugins", []) if p.get("name") == name), None)
+        assert entry, f".claude-plugin/marketplace.json has no entry named {name!r}"
+        for field, sources in (
+            ("name", (root, codex, claude, entry)),
+            ("version", (root, codex, claude, entry)),
+            ("description", (root, codex, claude)),
+        ):
+            values = {s.get(field) for s in sources}
+            assert len(values) == 1, f"'{field}' differs across manifests: {sorted(map(str, values))}"
+
+        # install wiring: Codex reads skills from ./skills/, its catalog points at the repo root
+        assert codex.get("skills") == "./skills/", ".codex-plugin/plugin.json 'skills' must be './skills/'"
+        cx = [p for p in codex_mp.get("plugins", []) if p.get("name") == name]
+        assert len(cx) == 1, f".agents/plugins/marketplace.json needs exactly one {name!r} entry"
+        assert cx[0].get("source") == {"source": "local", "path": "./"}, (
+            ".agents/plugins/marketplace.json entry must use a local './' source")
+        assert entry.get("source") == "./", ".claude-plugin/marketplace.json entry source must be './'"
+        assert os.path.isfile(os.path.join(ROOT, "skills", "system-design", "SKILL.md")), (
+            "skills/system-design/SKILL.md missing — every host discovers skills from ./skills/")
+        ok(f"Manifests — {name} {root['version']} consistent across plugin.json, .codex-plugin, .claude-plugin, .agents")
+    except Exception as e:
+        failures.append(f"manifests: {e}")
+        fail(f"Manifests ({e})")
+
 
 def main():
     print(f"{DIM}repo root: {ROOT}{RESET}\n")
@@ -230,6 +312,7 @@ def main():
     check_judge_control()
     check_self_contained()
     check_regressions()
+    check_manifests()
     print()
     if failures:
         print(f"{RED}{len(failures)} check(s) FAILED{RESET}")

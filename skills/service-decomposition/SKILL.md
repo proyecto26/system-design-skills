@@ -1,6 +1,6 @@
 ---
 name: service-decomposition
-description: This skill should be used when the user asks "monolith vs microservices", how to "split into services", set "service boundaries", find the right "service granularity", design an "API gateway / BFF", do "service discovery" or add a "service mesh", or worries that services are "too chatty" / "too fine-grained". It gives the recipe for carving a system into services (or deciding not to) and wiring how they find and call each other. Use it whenever a design has more than one service — or someone is tempted to add more — even if the user doesn't say "microservices".
+description: This skill should be used when the user asks "monolith vs microservices", how to "split into services", set "service boundaries", find the right "service granularity", design an "API gateway / BFF", do "service discovery" or add a "service mesh", or worries that services are "too chatty" / "too fine-grained" — including when a team is pushed to adopt microservices or Kafka between services "to be ready to scale" and the right answer may be a modular monolith. It gives the recipe for carving a system into services (or deciding not to) and wiring how they find and call each other. Use it whenever a design has more than one service — or someone is tempted to add more — even if the user doesn't say "microservices".
 ---
 
 # Service Decomposition
@@ -99,6 +99,10 @@ add a gateway/mesh/discovery layer before you have services that need them.
    wiring painful.
 6. **Stress-test the seams** — walk chattiness, cross-service transactions, retry
    cascades, and tracing before committing.
+7. **Show the trade-off in the answer** — give a `Decision | Solves | Worsens |
+   Change it when…` table with one row per choice you made here (e.g. the
+   option, its store, its failure policy); the last column is a concrete trigger
+   (a number or observable signal). Then name what breaks first.
 
 ## Dos and don'ts
 **Do**

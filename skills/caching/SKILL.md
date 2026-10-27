@@ -1,6 +1,6 @@
 ---
 name: caching
-description: This skill should be used when the user asks about a "caching strategy", "cache invalidation", "what to cache", "read-through vs write-through vs write-back", "cache eviction" (LRU/LFU/TTL), "Redis vs Memcached", "stale reads", or hits "thundering herd", "cache stampede", "cache penetration", or "hot key" problems. Use it whenever a design is read-heavy or a datastore is overloaded by reads, even if the user doesn't say "cache".
+description: This skill should be used when the user asks about a "caching strategy", "cache invalidation", "what to cache", "read-through vs write-through vs write-back", "cache eviction" (LRU/LFU/TTL), "Redis vs Memcached", "stale reads", or hits "thundering herd", "cache stampede", "cache penetration", or "hot key" problems, or is choosing a Redis `maxmemory` eviction policy (allkeys-lru, volatile-lru, noeviction) vs TTL expiry for sessions or other cached state. Use it whenever a design is read-heavy or a datastore is overloaded by reads, even if the user doesn't say "cache".
 ---
 
 # Caching
@@ -102,6 +102,10 @@ and origin QPS during cache restarts.
    that matter*).
 6. **Pick a provider** — default to the generic recipe; only open a provider file
    if the user named a cloud (see *Choosing a provider*).
+7. **Show the trade-off in the answer** — give a `Decision | Solves | Worsens |
+   Change it when…` table with one row per choice you made here (e.g. the
+   option, its store, its failure policy); the last column is a concrete trigger
+   (a number or observable signal). Then name what breaks first.
 
 ## Dos and don'ts
 **Do**

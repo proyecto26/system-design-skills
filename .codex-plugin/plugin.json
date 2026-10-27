@@ -1,0 +1,35 @@
+{
+  "name": "system-design-skills",
+  "version": "0.1.0",
+  "description": "A divide-and-conquer wiki of system-design skills. Reason about a design problem one part at a time -- requirements, capacity, APIs, storage, caching, load balancing, messaging, consistency, resilience, delivery, and scaling -- each with generic recipes, cloud-provider variants (AWS/Azure/GCP/Temporal), explicit trade-offs, and failure-mode analysis. Optimizes for reasoning over memorized architectures.",
+  "author": {
+    "name": "Proyecto 26",
+    "email": "jd@proyecto26.com",
+    "url": "https://github.com/proyecto26"
+  },
+  "homepage": "https://github.com/proyecto26/system-design-skills",
+  "repository": "https://github.com/proyecto26/system-design-skills",
+  "license": "MIT",
+  "keywords": [
+    "system-design",
+    "architecture",
+    "distributed-systems",
+    "scalability",
+    "trade-offs",
+    "interview"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "System Design Skills",
+    "shortDescription": "Reason about system design one building block at a time",
+    "longDescription": "A divide-and-conquer wiki of system-design skills: clarify requirements, estimate capacity, then compose building blocks (APIs, storage, caching, load balancing, messaging, consistency, resilience, delivery, scaling) with explicit trade-offs, failure-mode analysis, cloud-provider variants (AWS/Azure/GCP/Temporal), and a self-contained architecture-diagram renderer.",
+    "developerName": "Proyecto 26",
+    "category": "Coding",
+    "websiteURL": "https://github.com/proyecto26/system-design-skills",
+    "defaultPrompt": [
+      "Use the system-design skill to design a URL shortener for 10k writes/sec",
+      "Estimate storage and QPS for a chat app with 50M daily users",
+      "Should we cache this read-heavy endpoint? Walk me through the trade-offs"
+    ]
+  }
+}

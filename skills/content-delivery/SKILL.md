@@ -124,6 +124,10 @@ bytes, and 4xx/5xx at the edge vs origin.
    or origin request rate is alarming, revisit the cache key and TTL.
 6. **Pick a provider** — default to the generic recipe; if a cloud is named, read
    its provider file for the service mapping and limits (see `Choosing a provider`).
+7. **Show the trade-off in the answer** — give a `Decision | Solves | Worsens |
+   Change it when…` table with one row per choice you made here (e.g. the
+   option, its store, its failure policy); the last column is a concrete trigger
+   (a number or observable signal). Then name what breaks first.
 
 ## Dos and don'ts
 **Do**

@@ -136,6 +136,20 @@ ask the user a clarifying question rather than guessing silently.
   run the Quick Diagnostic in `references/failure-modes.md`, and state the weakest
   dimension + what would raise it.
 
+## Answer contract
+
+What the user reads must show the reasoning, not just contain it. Every design
+answer (first pass or revision) includes, in the reply itself:
+
+- **A decisions table** — one row per major choice (at least three for a full
+  design): `Decision | Solves | Worsens | Change it when…`. The last column is a
+  concrete trigger — a number or observable signal ("write QPS > 50k on one
+  shard", "a second team needs independent deploys"), never "if needed".
+- **A closing weakest-point line** — the part of this design that breaks first
+  as load or requirements grow, and the move you would make then.
+
+A pros/cons list, or trade-offs for only one choice, does not meet the bar.
+
 ## Running it as a workflow
 
 Two entry points drive this skill as a repeatable process:

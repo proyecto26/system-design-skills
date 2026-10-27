@@ -1,0 +1,9 @@
+{
+  "fps": 30,
+  "duration": 20,
+  "s1": { "typeStart": 0.7, "typeEnd": 1.75, "submit": 2.25, "exit": 3.4 },
+  "s2": { "in": 3.5, "drawOn": 3.6, "constraint": 5.0, "crack": 5.35, "exit": 7.0 },
+  "s3": { "in": 7.05, "steps": [7.5, 8.05, 8.6, 9.15, 9.7], "exit": 11.1 },
+  "s4": { "in": 11.15, "tiles": 11.35, "pick": 12.55, "assemble": 13.1, "wires": 13.75, "exit": 15.35 },
+  "s5": { "in": 15.4, "spark": 15.45, "line1": 15.6, "line2": 15.95, "meta": 16.7, "url": 17.0 }
+}

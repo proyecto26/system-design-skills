@@ -1,8 +1,9 @@
 # system-design-skills
 
 <p align="center">
-  <img src="docs/hero.png" alt="system-design-skills — compose scalable systems from modular building blocks" width="100%">
+  <a href="docs/hero.mp4"><img src="docs/hero.webp" alt="system-design-skills — a memorized diagram breaks under a real constraint; the reasoning loop (clarify, estimate, compose, trade-offs, stress-test) composes 20 building-block skills into an architecture" width="100%"></a>
 </p>
+<p align="center"><sub>Made in code with Remotion — the same scenes power the <a href="https://proyecto26.com/system-design-skills/">site</a>'s hero (<code>site/src/motion/</code>).</sub></p>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Plugin-blueviolet)](https://code.claude.com/docs/en/plugins)
@@ -63,6 +64,18 @@ Most system-design material teaches you to memorize finished architectures. That
 
 ### Installation
 
+### Standards
+
+This plugin follows the [Agent Plugins](https://agent-plugins.org/) v1.0.0 packaging standard (root [`plugin.json`](./plugin.json), validated against the official schema) and its skills follow the [Agent Skills](https://agentskills.io/) spec (`skills/<name>/SKILL.md`). One repository installs in several hosts:
+
+| Host | Reads | Gets |
+|------|-------|------|
+| Claude Code | `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json` | skills + `/design` command + orchestrator agent |
+| OpenAI Codex | `.codex-plugin/plugin.json` + `.agents/plugins/marketplace.json` | skills |
+| Cursor, Copilot CLI, other Agent Plugins clients | `plugin.json` (repo root) | skills |
+
+The manifests are kept in lockstep by `python3 meta/evals/run_checks.py` (same name / version / description everywhere; the root `plugin.json` stays inside the closed Agent Plugins schema).
+
 #### Option 1: CLI Install (Recommended)
 
 Use [npx skills](https://github.com/vercel-labs/skills) to install the skills directly:
@@ -81,6 +94,9 @@ This installs into your `.claude/skills/` directory.
 
 # Install the plugin (skills + the /design command + the orchestrator agent)
 /plugin install system-design-skills
+
+# or, in one step (Claude Code 2.1.275+)
+/plugin install system-design-skills --marketplace proyecto26/system-design-skills
 ```
 
 > **SSH errors?** The marketplace clones via SSH. If you don't have SSH keys on GitHub, force HTTPS:
@@ -89,21 +105,30 @@ This installs into your `.claude/skills/` directory.
 > /plugin install system-design-skills
 > ```
 
-#### Option 3: Clone and Copy
+#### Option 3: OpenAI Codex
+
+```bash
+codex plugin marketplace add proyecto26/system-design-skills
+codex plugin add system-design-skills@system-design-skills-marketplace
+```
+
+Codex loads the skills; the `/design` command and the orchestrator agent are Claude Code components, so in Codex start with *"use the system-design skill to design …"*.
+
+#### Option 4: Clone and Copy
 
 ```bash
 git clone https://github.com/proyecto26/system-design-skills.git
 cp -r system-design-skills/skills/* .claude/skills/
 ```
 
-#### Option 4: Local / development
+#### Option 5: Local / development
 
 ```bash
 git clone https://github.com/proyecto26/system-design-skills.git
 claude --plugin-dir ./system-design-skills
 ```
 
-#### Option 5: Fork and Customize
+#### Option 6: Fork and Customize
 
 Fork the repo, add your own building blocks or provider files (follow `meta/SKILL-CONTRACT.md`), and point your projects at your fork.
 
@@ -222,15 +247,27 @@ A realistic eval harness measures whether the skills make Claude design *better*
 
 See `meta/evals/README.md` for the full methodology (multi-turn delivery, broad coverage, variance, regression baselines).
 
+**With vs. without the plugin** — `evals/` is a [`claude plugin eval`](https://code.claude.com/docs/en/plugin-evals) suite (6 cases, each run with and without the plugin). Latest: url-shortener **+1.00**, over-decomposition **+0.27–0.40**, rate-limiter **+0.17–0.33**, focused single-block **+0.33**; details and what it changed in the skills are in [`evals/README.md`](evals/README.md).
+
+```bash
+claude plugin eval . --runs 1   # pilot, then drop --runs for the full suite
+```
+
 ---
 
 ## Project structure
 
 ```
 system-design-skills/
+├── plugin.json                      # Agent Plugins 1.0 manifest (Cursor, Copilot CLI, …)
 ├── .claude-plugin/
-│   ├── plugin.json                  # plugin manifest
-│   └── marketplace.json             # marketplace metadata
+│   ├── plugin.json                  # Claude Code plugin manifest
+│   └── marketplace.json             # Claude Code marketplace metadata
+├── .codex-plugin/
+│   └── plugin.json                  # OpenAI Codex plugin manifest
+├── .agents/plugins/
+│   └── marketplace.json             # Codex marketplace catalog
+├── evals/                           # `claude plugin eval` suite (with vs. without plugin)
 ├── agents/
 │   └── system-design-orchestrator.md  # autonomous driver of the reasoning loop
 ├── commands/
@@ -242,7 +279,8 @@ system-design-skills/
 ├── docs/                            # shared, in-repo references (not skills)
 │   ├── GUIDE.md                     #   the ten failure modes (source of the method)
 │   ├── study-path.md                #   interview-prep study path (links the pieces)
-│   └── hero.png                     #   README banner
+│   ├── hero.webp / hero.mp4         #   README hero film (rendered from site/src/motion/)
+│   └── hero.png                     #   social-card image (Open Graph)
 ├── meta/                            # maintainer docs + eval set (not skills)
 │   ├── SKILL-CONTRACT.md            #   the authoring contract every block follows
 │   ├── PLAN.md                      #   creation plan + status

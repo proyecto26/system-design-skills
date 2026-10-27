@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ReasoningLoop, OrchestrationFlow } from "./diagrams.jsx";
+import { ActiveSlide, FilmClip } from "./motion/FilmClip.jsx";
 
 /* Anthropic-style 4-spoke radial spike mark */
 function Spike({ className = "spike" }) {
@@ -16,12 +17,13 @@ const SLIDES = [
     <section className="slide slide--cream center" data-mode="cream">
       <div className="slide-inner stagger">
         <div className="badge badge--cream"><Spike /> proyecto26 / system-design-skills</div>
-        <h1 className="display" style={{ marginTop: "1.2rem" }}>Design systems by <em style={{ fontStyle: "normal", color: "var(--primary)" }}>reasoning</em>,<br />not by memorizing diagrams.</h1>
-        <p className="lead" style={{ marginTop: "1.2rem" }}>A divide-and-conquer wiki of <strong>22 composable building-block skills</strong> for Claude Code — clarify, size, compose, and justify every choice.</p>
-        <div className="stagger" style={{ display: "flex", gap: ".75rem", justifyContent: "center", marginTop: "1.8rem", flexWrap: "wrap" }}>
+        <h1 className="sr-only">Design systems by reasoning, not by memorizing diagrams.</h1>
+        <FilmClip slide={0} clip="full" className="film film--hero" label="A memorized diagram breaks under a real constraint; the reasoning loop — clarify, estimate, compose, trade-offs, stress-test — composes building-block skills into an architecture. Design systems by reasoning, not by memorizing diagrams." />
+        <p className="lead" style={{ marginTop: "1.1rem" }}>A divide-and-conquer wiki of <strong>22 composable building-block skills</strong> for Claude Code, Codex and any Agent Plugins host — clarify, size, compose, and justify every choice.</p>
+        <div className="stagger" style={{ display: "flex", gap: ".75rem", justifyContent: "center", marginTop: "1.2rem", flexWrap: "wrap" }}>
           <span className="badge badge--coral">22 skills</span>
           <span className="badge badge--cream">MIT</span>
-          <span className="badge badge--cream">Claude Code plugin</span>
+          <span className="badge badge--cream">Claude Code · Codex · Agent Plugins</span>
           <span className="badge badge--cream">self-contained</span>
         </div>
       </div>
@@ -47,11 +49,14 @@ const SLIDES = [
   ),
   // 3 — Building blocks idea
   (
-    <section className="slide slide--card center" data-mode="card">
-      <div className="slide-inner stagger">
-        <div className="eyebrow">The idea</div>
-        <h2 className="display" style={{ margin: ".6rem 0 1rem" }}>Lego, not templates.</h2>
-        <p className="lead" style={{ margin: "0 auto" }}>No full-solution templates. One skill per <em style={{ fontStyle: "normal" }}>part</em> of a system — each a reusable recipe with explicit trade-offs, behavior under stress, the numbers that matter, and cloud-provider variants. You compose them to fit the problem in front of you.</p>
+    <section className="slide slide--card" data-mode="card">
+      <div className="slide-inner split">
+        <div className="stagger">
+          <div className="eyebrow">The idea</div>
+          <h2 className="display" style={{ margin: ".6rem 0 1rem" }}>Lego, not templates.</h2>
+          <p className="lead">No full-solution templates. One skill per <em style={{ fontStyle: "normal" }}>part</em> of a system — each a reusable recipe with explicit trade-offs, behavior under stress, the numbers that matter, and cloud-provider variants. You compose them to fit the problem in front of you.</p>
+        </div>
+        <FilmClip slide={2} clip="compose" className="film film--card" label="Twenty building-block skills; eight of them lift out of the catalog and wire themselves into an architecture." />
       </div>
     </section>
   ),
@@ -227,6 +232,7 @@ export default function App() {
   }, [go]);
 
   return (
+    <ActiveSlide.Provider value={i}>
     <div className="deck">
       <div className="progress" style={{ width: `${((i + 1) / n) * 100}%` }} />
       {SLIDES.map((s, idx) =>
@@ -241,5 +247,6 @@ export default function App() {
       <div className="counter">{String(i + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}</div>
       <div className="hint">← → to navigate</div>
     </div>
+    </ActiveSlide.Provider>
   );
 }

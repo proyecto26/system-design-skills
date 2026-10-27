@@ -129,6 +129,10 @@ covered by `resilience-failure`; this block supplies the consistency cost of eac
    `back-of-the-envelope`. If strong consistency blows the budget, relax the model.
 6. **Map to a provider.** Default to the generic recipe; if a cloud is named, read its
    provider file for the managed consistency knobs and quorum-store limits.
+7. **Show the trade-off in the answer** — give a `Decision | Solves | Worsens |
+   Change it when…` table with one row per choice you made here (e.g. the
+   option, its store, its failure policy); the last column is a concrete trigger
+   (a number or observable signal). Then name what breaks first.
 
 ## Dos and don'ts
 **Do**

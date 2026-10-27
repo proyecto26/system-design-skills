@@ -172,8 +172,10 @@ they replace vague prose, they don't pad.
 
 - **`## How to apply` (component blocks)** — a numbered 4–6 step process for using
   this part in a design: clarify the inputs → pick from the options using the
-  trade-off table → set the key knobs → stress-test → size it → pick a provider.
-  Concrete and skimmable. (Method blocks already express this as their method
+  trade-off table → set the key knobs → stress-test → size it → pick a provider →
+  **show the trade-off in the answer** (a `Decision | Solves | Worsens | Change it
+  when…` table, one row per choice, then what breaks first). That last step is mandatory: evals
+  showed the reasoning stayed implicit without it. Concrete and skimmable. (Method blocks already express this as their method
   recipe, so they do not repeat it.)
 - **`## Dos and don'ts`** — a compact two-list (Do… / Don't…) of the highest-value
   guidance for this part, distilled from the skill (not new content). 4–6 bullets

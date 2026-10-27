@@ -7,14 +7,21 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "video:studio": "remotion studio src/motion/index.js",
+    "video:render": "remotion render src/motion/index.js HeroFilm out/hero.mp4 --crf=20",
+    "video:readme": "remotion render src/motion/index.js HeroFilm out/hero-clean.mp4 --crf=18 --props='{\"grain\":false}' && bash scripts/readme-media.sh out/hero-clean.mp4 ../docs"
   },
   "dependencies": {
+    "@remotion/google-fonts": "4.0.529",
+    "@remotion/player": "4.0.529",
     "@xyflow/react": "^12.3.5",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "remotion": "4.0.529"
   },
   "devDependencies": {
+    "@remotion/cli": "4.0.529",
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^5.4.11"
   },

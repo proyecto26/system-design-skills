@@ -121,6 +121,10 @@ and egress volume + cost.
    (metadata-index load), peak PUT/GET QPS, and monthly egress. → *Numbers that matter*.
 6. **Pick a provider** — default to the generic recipe; open a provider file only if the
    user named a cloud (see *Choosing a provider*).
+7. **Show the trade-off in the answer** — give a `Decision | Solves | Worsens |
+   Change it when…` table with one row per choice you made here (e.g. the
+   option, its store, its failure policy); the last column is a concrete trigger
+   (a number or observable signal). Then name what breaks first.
 
 ## Dos and don'ts
 **Do**

@@ -6,3 +6,6 @@ __pycache__/
 meta/*.workflow.js
 meta/**/*.workflow.js
 meta/ALIGNMENT-BRIEF.md
+evals/results/
+
+docs/design/

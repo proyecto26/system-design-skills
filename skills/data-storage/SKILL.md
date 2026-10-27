@@ -132,6 +132,10 @@ saturation/wait time, slow-query rate, lock waits, and disk/IOPS headroom.
 6. **Size it, then pick a provider** — compute shard count and per-node load from
    `back-of-the-envelope`; if it is one node, do not shard. Default to the generic
    recipe and read the provider file only when a cloud is named.
+7. **Show the trade-off in the answer** — give a `Decision | Solves | Worsens |
+   Change it when…` table with one row per choice you made here (e.g. the
+   option, its store, its failure policy); the last column is a concrete trigger
+   (a number or observable signal). Then name what breaks first.
 
 ## Dos and don'ts
 **Do**

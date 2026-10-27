@@ -138,6 +138,10 @@ end-to-end latency.
    and storage = rate × message size × retention (→ `back-of-the-envelope`).
 6. **Pick a provider.** Default to the generic recipe; only read a provider file
    if the user names a cloud and a managed limit changes the choice.
+7. **Show the trade-off in the answer** — give a `Decision | Solves | Worsens |
+   Change it when…` table with one row per choice you made here (e.g. the
+   option, its store, its failure policy); the last column is a concrete trigger
+   (a number or observable signal). Then name what breaks first.
 
 ## Dos and don'ts
 **Do**

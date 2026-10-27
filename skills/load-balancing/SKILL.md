@@ -130,6 +130,10 @@ distribution.
    `back-of-the-envelope`.
 6. **Pick a provider** — default to the generic recipe; if a cloud is named, read
    its provider file for the managed-service mapping and limits.
+7. **Show the trade-off in the answer** — give a `Decision | Solves | Worsens |
+   Change it when…` table with one row per choice you made here (e.g. the
+   option, its store, its failure policy); the last column is a concrete trigger
+   (a number or observable signal). Then name what breaks first.
 
 ## Dos and don'ts
 **Do**

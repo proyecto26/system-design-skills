@@ -129,6 +129,10 @@ per-version traffic (to know when an old version can be retired).
    protocol and poll-vs-push choice (→ `back-of-the-envelope`).
 6. **Pick a provider.** Keep the generic recipe unless the user names a cloud,
    then map to its managed gateway (see *Choosing a provider*).
+7. **Show the trade-off in the answer** — give a `Decision | Solves | Worsens |
+   Change it when…` table with one row per choice you made here (e.g. the
+   option, its store, its failure policy); the last column is a concrete trigger
+   (a number or observable signal). Then name what breaks first.
 
 ## Dos and don'ts
 **Do**

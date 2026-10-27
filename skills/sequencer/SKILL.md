@@ -111,6 +111,10 @@ latency and range-exhaustion rate, and duplicate-key errors (should be zero).
 6. **Pick a provider** — default to the generic recipe (a Snowflake library, a
    ticket row, or ULID/UUIDv7); only open a provider file if the user named a
    cloud (see *Choosing a provider*).
+7. **Show the trade-off in the answer** — give a `Decision | Solves | Worsens |
+   Change it when…` table with one row per choice you made here (e.g. the
+   option, its store, its failure policy); the last column is a concrete trigger
+   (a number or observable signal). Then name what breaks first.
 
 ## Dos and don'ts
 **Do**
