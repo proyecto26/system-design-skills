@@ -247,7 +247,7 @@ A realistic eval harness measures whether the skills make Claude design *better*
 
 See `meta/evals/README.md` for the full methodology (multi-turn delivery, broad coverage, variance, regression baselines).
 
-**With vs. without the plugin** — `evals/` is a [`claude plugin eval`](https://code.claude.com/docs/en/plugin-evals) suite (6 cases, each run with and without the plugin). Latest: url-shortener **+1.00**, over-decomposition **+0.27–0.40**, rate-limiter **+0.17–0.33**, focused single-block **+0.33**; details and what it changed in the skills are in [`evals/README.md`](evals/README.md).
+**With vs. without the plugin** — `evals/` is a [`claude plugin eval`](https://code.claude.com/docs/en/plugin-evals) suite (6 cases, each run with and without the plugin). Latest: url-shortener **+1.00**, over-decomposition **+0.27**, rate-limiter **+0.17** (targeted re-runs: +0.40 / +0.33); single-block, estimation and out-of-scope cases tie the baseline. Per-run detail and what it changed in the skills are in [`evals/README.md`](evals/README.md).
 
 ```bash
 claude plugin eval . --runs 1   # pilot, then drop --runs for the full suite

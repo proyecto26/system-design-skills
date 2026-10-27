@@ -8,11 +8,15 @@ export const ActiveSlide = createContext(0);
 
 const sec = (s) => Math.round(s * FILM.fps);
 
-/** Named ranges of the hero film, so slides reuse a scene without re-implementing it. */
+/**
+ * Named ranges of the hero film, so slides reuse a scene without re-implementing it.
+ * `poster` is the settled frame shown under reduced motion: inside the range and before any
+ * fade-out (the full film's last frames are an exit fade to an empty background).
+ */
 export const CLIPS = {
-  full: [0, FILM.durationInFrames - 1],
-  compose: [sec(TL.s4.in), sec(TL.s4.exit) - 1],
-  loop: [sec(TL.s3.in), sec(TL.s3.exit) - 1],
+  full: { from: 0, to: FILM.durationInFrames - 1, poster: sec(TL.s5.url + 1.2) },
+  compose: { from: sec(TL.s4.in), to: sec(TL.s4.exit) - 1, poster: sec(TL.s4.exit) - 1 },
+  loop: { from: sec(TL.s3.in), to: sec(TL.s3.exit) - 1, poster: sec(TL.s3.exit) - 1 },
 };
 
 function usePrefersReducedMotion() {
@@ -29,13 +33,13 @@ function usePrefersReducedMotion() {
 
 /**
  * The same Remotion composition that renders docs/hero.mp4, played live in the page.
- * With reduced motion it holds on the clip's last (settled) frame instead of playing.
+ * With reduced motion it holds on the clip's settled poster frame instead of playing.
  */
 export function FilmClip({ slide, clip = "full", label, className = "film" }) {
   const ref = useRef(null);
   const active = useContext(ActiveSlide) === slide;
   const reduce = usePrefersReducedMotion();
-  const [from, to] = CLIPS[clip];
+  const { from, to, poster } = CLIPS[clip];
 
   useEffect(() => {
     const p = ref.current;
@@ -43,7 +47,7 @@ export function FilmClip({ slide, clip = "full", label, className = "film" }) {
     if (import.meta.env.DEV) (window.__films ||= {})[clip] = p;
     if (!active || reduce) {
       p.pause();
-      p.seekTo(reduce ? to : from);
+      p.seekTo(reduce ? poster : from);
       return;
     }
     // Start once the page fonts are ready and the Player has painted, so the first frames
@@ -64,7 +68,7 @@ export function FilmClip({ slide, clip = "full", label, className = "film" }) {
       cancelled = true;
       cancelAnimationFrame(raf);
     };
-  }, [active, reduce, from, to]);
+  }, [active, reduce, from, poster]);
 
   return (
     <div className={className} role="img" aria-label={label}>
@@ -77,7 +81,7 @@ export function FilmClip({ slide, clip = "full", label, className = "film" }) {
         fps={FILM.fps}
         inFrame={from}
         outFrame={to}
-        initialFrame={reduce ? to : from}
+        initialFrame={reduce ? poster : from}
         loop
         controls={false}
         clickToPlay={false}

@@ -23,7 +23,9 @@ Checks:
      anti-microservices stance, and its corrected latency math.
   5. Manifest consistency — the Agent Plugins root plugin.json, the Codex and
      Claude Code manifests, and both marketplace catalogs agree on name/version/
-     description and install wiring; plugin.json obeys the closed 1.0.0 schema.
+     description and install wiring (incl. the Codex install policy); plugin.json
+     obeys the closed 1.0.0 schema's keys, name pattern, and value types (an offline
+     re-implementation — it does not fetch the schema).
 
 Exit code 0 if all pass, 1 otherwise.
 """
@@ -160,6 +162,14 @@ def _read(rel):
 # the two skill dirs that are NOT building blocks: the method/orchestrator and
 # the renderer. Everything else under skills/ is a composable building block.
 _NON_BLOCK_SKILLS = {"system-design", "architecture-diagram"}
+# Component blocks (How-to-apply + answer step). Method blocks — requirements-scoping,
+# back-of-the-envelope, scaling-evolution — express this as their method recipe instead.
+_COMPONENT_BLOCKS = (
+    "api-design", "blob-store", "caching", "consistency-coordination", "content-delivery",
+    "data-storage", "distributed-logging", "distributed-search", "dns", "load-balancing",
+    "messaging-streaming", "observability", "resilience-failure", "sequencer",
+    "service-decomposition", "sharded-counters", "task-scheduling",
+)
 
 
 def check_regressions():
@@ -230,18 +240,34 @@ def check_regressions():
     # --- trade-off discipline must be VISIBLE in answers. `claude plugin eval`
     # (evals/*/graders/tradeoff-discipline.md) failed in BOTH arms until the
     # orchestrator carried an answer contract and every component block ended
-    # its How-to-apply with "show the trade-off in the answer".
+    # its How-to-apply with a decisions table. Check the full structure against an
+    # explicit inventory, so deleting a section can't silently drop a block from
+    # inspection, and reject the earlier singular wording that the eval showed was
+    # too weak.
     try:
         sd = _read(os.path.join("skills", "system-design", "SKILL.md"))
-        assert "## Answer contract" in sd and "Change it when" in sd, (
-            "system-design lost its Answer contract (decisions table + weakest point)")
-        missing = [
-            d for d in sorted(os.listdir(os.path.join(ROOT, "skills")))
-            if "## How to apply" in (txt := _read(os.path.join("skills", d, "SKILL.md")))
-            and "Show the trade-off in the answer" not in txt
-        ]
-        assert not missing, f"How-to-apply lacks the 'show the trade-off' step: {missing}"
-        ok("Regression — answer contract + per-block 'show the trade-off' step present")
+        m = re.search(r"^## Answer contract\n(.*?)(?=^## )", sd, re.S | re.M)
+        assert m, "system-design lost its '## Answer contract' section"
+        contract = re.sub(r"\s+", " ", m.group(1))
+        for need in ("Decision | Solves | Worsens | Change it when", "weakest-point", "breaks first"):
+            assert need in contract, f"Answer contract lost {need!r}"
+        bad = []
+        for d in _COMPONENT_BLOCKS:
+            txt = _read(os.path.join("skills", d, "SKILL.md"))
+            h = re.search(r"^## How to apply\n(.*?)(?=^## )", txt, re.S | re.M)
+            if not h:
+                bad.append(f"{d}: no How-to-apply section"); continue
+            step = re.sub(r"\s+", " ", h.group(1))
+            if "Show the trade-off in the answer" not in step:
+                bad.append(f"{d}: missing 'show the trade-off' step")
+            elif "Decision | Solves | Worsens | Change it when" not in step:
+                bad.append(f"{d}: step lacks the decisions-table columns")
+            elif "what breaks first" not in step:
+                bad.append(f"{d}: step lacks 'what breaks first'")
+            if "for the option you chose" in step:
+                bad.append(f"{d}: reverted to the singular 'for the option you chose' wording")
+        assert not bad, "; ".join(bad)
+        ok(f"Regression — answer contract + decisions-table step in all {len(_COMPONENT_BLOCKS)} component blocks")
     except Exception as e:
         failures.append(f"regression/answer-contract: {e}")
         fail(f"Regression — answer contract ({e})")
@@ -277,7 +303,20 @@ def check_manifests():
         assert not extra, f"plugin.json has fields outside the Agent Plugins schema: {sorted(extra)}"
         assert isinstance(name, str) and len(name) <= 64 and _AGENT_PLUGINS_NAME.match(name), (
             f"plugin.json name {name!r} violates the Agent Plugins name pattern")
-        assert set(root.get("author", {})) <= {"name", "email", "url"}, "plugin.json author has extra keys"
+        # value types, per the 1.0.0 schema (every listed field is a string except
+        # author{name,email,url: string}, keywords[string], extensions{ns: object})
+        for f in ("version", "description", "homepage", "repository", "license"):
+            if f in root:
+                assert isinstance(root[f], str), f"plugin.json {f} must be a string"
+        author = root.get("author", {})
+        assert isinstance(author, dict) and set(author) <= {"name", "email", "url"}, (
+            "plugin.json author must be an object with only name/email/url")
+        assert all(isinstance(v, str) for v in author.values()), "plugin.json author values must be strings"
+        kw = root.get("keywords", [])
+        assert isinstance(kw, list) and all(isinstance(k, str) for k in kw), "plugin.json keywords must be a string array"
+        ext = root.get("extensions", {})
+        assert isinstance(ext, dict) and all(isinstance(v, dict) for v in ext.values()), (
+            "plugin.json extensions must map namespaces to objects")
 
         # identity: name + version everywhere, description across the plugin manifests
         entry = next((p for p in claude_mp.get("plugins", []) if p.get("name") == name), None)
@@ -296,6 +335,9 @@ def check_manifests():
         assert len(cx) == 1, f".agents/plugins/marketplace.json needs exactly one {name!r} entry"
         assert cx[0].get("source") == {"source": "local", "path": "./"}, (
             ".agents/plugins/marketplace.json entry must use a local './' source")
+        assert cx[0].get("policy") == {"installation": "AVAILABLE", "authentication": "ON_INSTALL"}, (
+            ".agents/plugins/marketplace.json entry policy must be AVAILABLE / ON_INSTALL")
+        assert cx[0].get("category"), ".agents/plugins/marketplace.json entry is missing 'category'"
         assert entry.get("source") == "./", ".claude-plugin/marketplace.json entry source must be './'"
         assert os.path.isfile(os.path.join(ROOT, "skills", "system-design", "SKILL.md")), (
             "skills/system-design/SKILL.md missing — every host discovers skills from ./skills/")
