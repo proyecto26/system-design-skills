@@ -18,7 +18,7 @@
 
 ```mermaid
 flowchart TB
-    U["🧑 &quot;design X&quot; · system-design interview"]
+    U["🧑 'design X' · system-design interview"]
     U --> ENTRY["/design command&nbsp;&nbsp;·&nbsp;&nbsp;system-design-orchestrator agent"]
     ENTRY --> LOOP
 
